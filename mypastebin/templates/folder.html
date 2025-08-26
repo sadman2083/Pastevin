@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{{ folder_name }} - PasteVin Folder</title>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/942/942748.png" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4faf8;
+            padding: 20px;
+            font-family: 'Tahoma' ,'Roboto', sans-serif;
+        }
+
+        .ten {
+            position: relative;
+            font-weight: bold;
+            padding-left: 10px;
+        }
+
+        .ten:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 5px;
+            height: 100%;
+            background-color: #3498DB;
+        }
+
+        .note-card {
+            background-color: #ffffff;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.05);
+            flex-wrap: wrap;
+        }
+
+        .note-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tru-fname {
+            max-width: 65%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+        }
+
+        .preview-text {
+            font-size: 0.9rem;
+            color: #6c757d;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            max-width: 65%;
+            margin-right: 10px;
+        }
+        .tr {
+            font-weight: bold;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn {
+            padding: 8px 14px;
+            font-weight: 550;
+            border-radius: 8px;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #0066cc;
+        }
+
+        .btn-primary:hover {
+            background-color: #004c99;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .btn-copy {
+            background-color: #f2ed91;
+        }
+
+        .btn-copy:hover {
+            background-color: #f2ed91;
+        }
+        .file-link{
+            font-weight: bold;
+        }
+
+       a.note-link{
+
+            text-decoration : none !important;
+        }
+ 
+
+
+
+        #pin-close-btn {
+          position: absolute;
+          top: 100px;
+          right: 30px;
+          background-color: #dc3545;
+          color: white;
+          border: none;
+          border-radius: 50%;
+          width: 45px;
+          height: 45px;
+          font-size: 25px;
+          font-weight: bold;
+          cursor: pointer;
+          z-index: 2000;
+        }
+
+        
+
+        #pin-close-btn:hover {
+          background-color: #c82333;
+        }
+
+        @media (max-width: 576px) {
+            .note-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .action-buttons {
+                margin-top: 5px;
+                width: 100%;
+                justify-content: space-between;
+            }
+    
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="folder-section">
+    <h1 class="mb-4 ten" style="font-weight: normal;">{{ folder_name }} Folder</h1>
+    <!-- PIN Pad Section -->
+    <div id="pin-popup" class="pin-popup" >
+        <button type="button" onclick="closePinPad()" id="pin-close-btn">✕</button>
+
+
+
+      <div class="bg-light p-4 shadow" style="width: 250px; border-radius: 35px;">
+        <div id="pin-display" class="mb-3 bg-warning text-center fw-bold fs-4 py-2">••••</div>
+          <div id="pin-error" class="text-danger mt-2" style="font-size: 0.9rem; display: none;">Wrong PIN</div>
+          <div class="d-grid gap-2">
+            <div class="d-flex justify-content-between">
+              <button class="pin-btn" onclick="pressDigit(1)">1</button>
+              <button class="pin-btn" onclick="pressDigit(2)">2</button>
+              <button class="pin-btn" onclick="pressDigit(3)">3</button>
+            </div>
+            <div class="d-flex justify-content-between">
+              <button class="pin-btn" onclick="pressDigit(4)">4</button>
+              <button class="pin-btn" onclick="pressDigit(5)">5</button>
+              <button class="pin-btn" onclick="pressDigit(6)">6</button>
+            </div>
+            <div class="d-flex justify-content-between">
+              <button class="pin-btn" onclick="pressDigit(7)">7</button>
+              <button class="pin-btn" onclick="pressDigit(8)">8</button>
+              <button class="pin-btn" onclick="pressDigit(9)">9</button>
+            </div>
+              <!-- <button class="btn-clear" style="position: absolute; bottom: 200px; right: 500px;" onclick="clearPin()">Clear</button> -->
+
+
+
+              <div class="d-flex justify-content-center mt-2">
+                <button class="pin-btn" onclick="pressDigit(0)">0</button>
+              </div>
+
+          </div>
+
+      </div>
+    </div>
+
+    <!-- Bouncy Button Styles -->
+    <style>
+        .pin-popup {
+          display: none;
+          position: fixed;
+          z-index: 1050;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0,0,0,0.2);
+          align-items: center;
+          justify-content: center;
+        }
+
+        .pin-popup.show {
+          display: flex;
+        }
+
+      .pin-btn {
+        background-color: #14213d;
+        border: none;
+        color: white;
+        font-weight: bold;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        transition: transform 0.1s ease;
+          box-shadow: 0 4px 0 #828c87;
+      }
+
+      .pin-btn:active {
+        transform: scale(0.9);
+      }
+
+      #pin-display {
+        letter-spacing: 8px;
+          border-radius: 22px;
+      }
+    </style>
+
+    <!-- PIN Pad Logic -->
+    <script>
+         const correctPin = "{{ pin_code }}";
+
+        function pressDigit(num) {
+          if (currentPin.length < 4) {
+            currentPin += num;
+            updateDisplay();
+            if (currentPin.length === 4) {
+              submitPin(); // auto-submit after 4 digits
+            }
+          }
+        }
+
+        function updateDisplay() {
+          document.getElementById('pin-display').textContent = currentPin.padEnd(4, '•');
+        }
+
+      function clearPin() {
+        currentPin = "";
+        updateDisplay();
+      }
+
+        function submitPin() {
+          const display = document.getElementById('pin-display');
+
+          if (currentPin === correctPin) {
+            if (pendingDeleteForm) {
+              showToast("File deleted!");
+              pendingDeleteForm.submit();
+              pendingDeleteForm = null;
+            }
+            closePinPad();
+          } else {
+            display.textContent = "Wrong PIN";
+            display.classList.remove("bg-warning");
+            display.classList.add("bg-danger");
+
+            setTimeout(() => {
+              clearPin();
+              display.classList.remove("bg-danger");
+              display.classList.add("bg-warning");
+            }, 1200);  
+          }
+        }
+
+
+
+
+
+        let pendingDeleteForm = null;
+
+        function handleDeleteRequest(form) {
+          pendingDeleteForm = form;
+          openPinPad();
+        }
+
+
+      // Optional: trigger it with a button elsewhere
+        function openPinPad() {
+          const popup = document.getElementById('pin-popup');
+          popup.classList.add('show');
+          clearPin();
+        }
+
+       function closePinPad() {
+          const popup = document.getElementById('pin-popup');
+          popup.classList.remove('show');
+        }
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+    
+
+    <a href="{{ url_for('home') }}#folders" class="btn btn-primary mb-3">← Back to Home</a>
+
+    <!-- Rename Folder -->
+    <section id="rename-folder">
+        <form method="POST" action="{{ url_for('rename_folder', folder_name=folder_name) }}#rename-folder" class="mb-4 d-flex gap-2">
+            <input type="text" name="new_name" placeholder="New Folder Name" class="form-control" required>
+            <button type="submit" class="btn btn-primary">Rename Folder</button>
+        </form>
+    </section>
+
+    <!-- Add Note in Folder -->
+    <section id="add-note">
+        <form method="POST" action="{{ url_for('save') }}#add-note" class="mb-4">
+            <input type="hidden" name="folder" value="{{ folder_name }}">
+            <input class="form-control mb-2" type="text" name="title" placeholder="Enter note title">
+            <textarea class="form-control mb-2" name="content" placeholder="Enter note content" required></textarea>
+            <button type="submit" class="btn btn-primary">Save Note in {{ folder_name }}</button>
+        </form>
+    </section>
+
+    <!-- Upload File in Folder -->
+    <section id="upload-files">
+        <h4 class="ten" style="font-weight: normal;">Upload File to {{ folder_name }}</h4>
+        <form method="POST" action="{{ url_for('upload_file_to_folder', folder_name=folder_name) }}#upload-files" enctype="multipart/form-data" class="mb-4">
+            <input class="form-control mb-2" type="file" name="files" multiple required>
+            <button type="submit" class="btn btn-primary">Upload File(s)</button>
+        </form>
+    </section>
+
+    <!-- Files in Folder -->
+    {% if files %}
+    <section id="files">
+        <h4 class="ten">Files in {{ folder_name }}</h4>
+        {% for file in files %}
+            <div class="note-card">
+                <div class="note-content">
+                    <a class="file-link text-decoration-none " href="{{ url_for('uploaded_file', filename=folder_name + '/' + file) }}">{{ file }}</a>
+                    
+                </div>
+                <div class="action-buttons">
+                    <form method="POST" action="{{ url_for('delete_file_from_folder', folder_name=folder_name, filename=file) }}#files">
+                        <input type="password" name="password" style="display: none;" value="{{ pin_code }}">
+
+                        <button type="button" class="btn btn-danger" onclick="handleDeleteRequest(this.closest('form'))">Delete</button>
+
+
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+    </section>
+    {% endif %}
+
+    <!-- Notes in Folder with Preview and Copy Button -->
+    <section id="notes">
+        <h3 class="ten">Notes in {{ folder_name }}</h3>
+        {% for key, content in notes.items() %}
+            {% if key.startswith(folder_name + '/') and key != folder_name + '/' %}
+        <div class="note-card " id="note-{{ key }}">
+            <div class="note-content">
+                <a href="{{ url_for('view_note', key=key) }}" class="note-link">{{ key.split('/')[-1] }}</a>
+                <div class="preview-text" id="content-{{ key }}" data-full="{{ content|e }}">
+                    {{ content.split('\n')[0][:50] }}...
+                </div>
+
+            </div>
+            <div>
+                <button class="btn btn-copy btn-sm" onclick="copyContent(`{{ key }}`)">Copy</button>
+<form method="POST" action="{{ url_for('delete_note', key=key) }}#notes" style="display:inline;">
+                    <input type="password" name="password" style="display: none;" value="{{ pin_code }}">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="handleDeleteRequest(this.closest('form'))">Delete</button>
+                </form>
+            </div>
+        </div>
+
+            {% endif %}
+        {% endfor %}
+    </section>
+
+</div>
+
+<script>
+
+    function showToast(message) {
+        let toast = document.createElement("div");
+        toast.innerText = message;
+        toast.style.position = "fixed";
+        toast.style.bottom = "30px";
+        toast.style.left = "50%";
+        toast.style.transform = "translateX(-50%)";
+        toast.style.backgroundColor = "#ed4337";  // red for delete
+        toast.style.color = "white";
+        toast.style.padding = "10px 20px";
+        toast.style.borderRadius = "8px";
+        toast.style.boxShadow = "0 2px 5px rgba(0,0,0,0.2)";
+        toast.style.zIndex = "9999";
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
+    }
+
+    
+
+    function copyContent(key) {
+        const element = document.getElementById(`content-${key}`);
+        if (element) {
+            const text = element.dataset.full || element.innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                let toast = document.createElement("div");
+                toast.innerText = "Copied!";
+                toast.style = `position: fixed; bottom: 30px; left: 50%;
+                               transform: translateX(-50%); background: #28a745;
+                               color: white; padding: 10px 20px; border-radius: 8px;
+                               box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 9999`;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 1500);
+            });
+        }
+    }
+
+
+    function copyBase64(btn) {
+        const base = btn.dataset.base;
+        const decoded = atob(base);
+        navigator.clipboard.writeText(decoded).then(() => {
+            let toast = document.createElement("div");
+            toast.innerText = "Copied!";
+            toast.style.position = "fixed";
+            toast.style.bottom = "30px";
+            toast.style.left = "50%";
+            toast.style.transform = "translateX(-50%)";
+            toast.style.backgroundColor = "#28a745";
+            toast.style.color = "white";
+            toast.style.padding = "10px 20px";
+            toast.style.borderRadius = "8px";
+            toast.style.boxShadow = "0 2px 5px rgba(0,0,0,0.2)";
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 1500);
+        });
+    }
+
+
+</script>
+
+</body>
+</html>

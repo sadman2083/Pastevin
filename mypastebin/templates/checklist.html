@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Checklist</title>
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/942/942748.png" type="image/png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f9f9f9;
+      padding: 20px;
+    }
+
+    .task-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .task-text.done {
+      text-decoration: line-through;
+      color: gray;
+    }
+
+    .btn-icon {
+      padding: 0.2rem 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 576px) {
+      h2 {
+        font-size: 1.4rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h2 class="mb-3">
+      <a href="/checklist" class="text-decoration-none text-dark">📝 Checklist</a>
+    </h2>
+
+
+    <div class="mb-3">
+      <label for="datePicker" class="form-label">Select Date:</label>
+      <input type="date" id="datePicker" class="form-control" />
+    </div>
+
+    <ul id="taskList" class="list-group mb-3"></ul>
+
+    <div class="input-group mb-3">
+      <input type="text" id="newTask" class="form-control" placeholder="New task..." />
+      <button id="addTaskBtn" class="btn btn-success">Add</button>
+
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const datePicker = document.getElementById("datePicker");
+      const taskList = document.getElementById("taskList");
+      const todayDisplay = document.getElementById("todayDisplay");
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const passedDate = urlParams.get('date');
+      const localNow = new Date();
+      const year = localNow.getFullYear();
+      const month = String(localNow.getMonth() + 1).padStart(2, '0');
+      const day = String(localNow.getDate()).padStart(2, '0');
+      const today = `${year}-${month}-${day}`;
+
+      datePicker.value = passedDate || today;
+      document.getElementById("addTaskBtn").addEventListener("click", addTask);
+
+      if (todayDisplay) {
+        const fullDate = new Date().toLocaleDateString(undefined, {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+        todayDisplay.textContent = `📅 Today is ${fullDate}`;
+      }
+
+      datePicker.addEventListener("change", () => {
+        loadTasks();
+      });
+
+      async function loadTasks() {
+        const res = await fetch(`/api/tasks/${datePicker.value}`);
+        const data = await res.json();
+        taskList.innerHTML = "";
+
+        data.forEach((task, i) => {
+          const li = document.createElement("li");
+          li.className = "list-group-item d-flex justify-content-between align-items-center";
+
+          const bubble = document.createElement("span");
+          bubble.className = "rounded-circle border me-3";
+          bubble.style.width = "20px";
+          bubble.style.height = "20px";
+          bubble.style.display = "inline-block";
+          bubble.style.cursor = "pointer";
+          bubble.style.borderWidth = "2px";
+          bubble.style.transition = "0.2s";
+          bubble.onclick = () => toggleTask(i);
+
+          if (task.done) {
+            bubble.style.backgroundColor = "#d1e7dd";
+            bubble.style.borderColor = "#198754";
+          } else {
+            bubble.style.backgroundColor = "transparent";
+            bubble.style.borderColor = "#ccc";
+          }
+
+          const text = document.createElement("span");
+          text.textContent = task.text;
+          text.style.flexGrow = "1";
+          text.style.cursor = "pointer";
+          text.onclick = () => {
+            window.location.href = `/view_task/${datePicker.value}/${i}?view=1`;
+          };
+          if (task.done) {
+            text.classList.add("text-decoration-line-through", "text-muted");
+          }
+
+          const editBtn = document.createElement("button");
+          editBtn.textContent = "✏️";
+          editBtn.className = "btn btn-sm btn-outline-secondary ms-1";
+          editBtn.onclick = () => {
+            window.location.href = `/edit_task/${datePicker.value}/${i}`;
+          };
+
+
+          const delBtn = document.createElement("button");
+          delBtn.textContent = "🗑";
+          delBtn.className = "btn btn-sm btn-outline-danger ms-1";
+          delBtn.onclick = () => deleteTask(i);
+
+          li.append(bubble, text, editBtn, delBtn);
+          taskList.appendChild(li);
+        });
+      }
+
+      async function addTask() {
+        const input = document.getElementById("newTask");
+        const text = input.value.trim();
+        if (!text) return;
+        await fetch("/api/add_task", {
+          method: "POST",
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ date: datePicker.value, text })
+        });
+        input.value = "";
+        loadTasks();
+      }
+
+      async function toggleTask(index) {
+        await fetch("/api/update_task", {
+          method: "POST",
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ date: datePicker.value, index })
+        });
+        loadTasks();
+      }
+
+      async function deleteTask(index) {
+        await fetch("/api/delete_task", {
+          method: "POST",
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ date: datePicker.value, index })
+        });
+        loadTasks();
+      }
+
+      loadTasks();
+    });
+  </script>
+
+
+
+
+  <div class="text-center mt-4">
+    <a href="/" class="btn btn-outline-dark">← Back to PasteVin</a>
+  </div>
+
+  <div id="todayDisplay" class="text-center mt-4 text-muted"></div>
+
+</body>
+
+</html>

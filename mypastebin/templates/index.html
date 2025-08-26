@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PasteVin</title>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/942/942748.png" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Tahoma', 'Roboto', 'Helvetica Neue', sans-serif;
+            background-color: #f4faf8;
+            padding: 20px;
+        }
+
+        .ten {
+            position: relative;
+            font-weight: bold;
+            padding-left: 10px;
+
+        }
+
+        .ten:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 5px;
+            height: 100%;
+            background-color: #3498DB;
+        }
+
+        .btn {
+            padding: 8px 14px;
+            font-weight: 550;
+            border-radius: 8px;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #0066cc;
+            ;
+        }
+
+        .btn-primary:hover {
+            background-color: #004c99;
+        }
+
+        .btn-danger {
+            background-color: #cc0000;
+        }
+
+        .btn-danger:hover {
+            background-color: #990000;
+        }
+
+        .btn-copy {
+            background-color: #f2ed91;
+            color: #333333;
+            border: none;
+            padding: 4px 12px !important;
+            font-size: 0.85rem !important;
+            line-height: 1 !important;
+            height: 45px !important;
+            vertical-align: middle;
+        }
+
+        .tru-fname {
+            max-width: 50%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+        }
+
+
+        .checklist-btn {
+            position: absolute;
+            top: 75px;
+            right: 1rem;
+            background-color: #ffffff;
+            border: 2px solid #0d6efd;
+            color: #0d6efd;
+            padding: 4px;
+            border-radius: 25px;
+            font-weight: 600;
+            text-decoration: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            z-index: 1000;
+        }
+
+        .checklist-btn:hover {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .btn-copy:hover {
+            background-color: #f2ed91;
+        }
+
+        .btn-copy:focus {
+            outline: none;
+            box-shadow: 0 0 4px #f2ed91;
+        }
+
+        .note-card,
+        .file-card {
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .note-link,
+        .file-link,
+        .folder-link {
+            font-weight: bold;
+            text-decoration: none;
+            color: #0d6efd;
+        }
+
+        .note-link:hover,
+        .file-link:hover,
+        .folder-link:hover {
+            text-decoration: underline;
+        }
+
+        .preview-text {
+            font-size: 0.85rem;
+            color: #6c757d;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            display: block;
+        }
+
+        .logo-glow {
+            color: #27374D;
+            position: relative;
+            display: inline-block;
+            font-weight: bold;
+            animation: halo 1s ease-in-out infinite;
+        }
+
+        .logo-glow::before {
+            content: '';
+            position: absolute;
+            top: -0%;
+            left: -50%;
+            width: 185%;
+            height: 60%;
+            border-radius: 20%;
+            background: radial-gradient(circle, rgba(192, 192, 192, 0.3) 10%, transparent 100%);
+            animation: orbitGlow 3s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes halo {
+
+            0%,
+            100% {
+                text-shadow: 0 0 5px rgba(160, 160, 160, 0.2);
+            }
+
+            50% {
+                text-shadow: 0 0 15px rgba(192, 192, 192, 0.5);
+            }
+        }
+
+        @keyframes orbitGlow {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .btn-ok {
+            background-color: #00c851;
+            /* Soft green */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0px 0px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            width: 49px;
+            height: 53px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+            transition: transform 0.1s ease, background-color 0.2s;
+        }
+
+        .btn-ok:hover {
+            background-color: #007e33;
+            /* darker on hover */
+        }
+
+        .btn-ok:active {
+            transform: scale(0.95);
+        }
+
+
+        .btn-clear {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0px 0px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            width: 49px;
+            height: 53px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+            transition: transform 0.1s ease, background-color 0.2s ease;
+        }
+
+        .btn-clear:hover {
+            background-color: #c82333;
+        }
+
+        .btn-clear:active {
+            transform: scale(0.95);
+        }
+
+        #pin-close-btn {
+            position: absolute;
+            top: 100px;
+            right: 30px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            font-size: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 2000;
+        }
+
+
+
+        #pin-close-btn:hover {
+            background-color: #c82333;
+        }
+
+        @media (max-width: 576px) {
+            .note-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .action-buttons {
+                margin-top: 5px;
+                width: 100%;
+                justify-content: space-between;
+            }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- Header with Animation -->
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+            <svg xmlns="http://www.w3.org/2000/svg" height="40" viewBox="0 0 24 24" width="40" fill="#2c3e50">
+                <path d="M0 0h24v24H0V0z" fill="none" />
+                <path d="M16 1H4c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7l-6-6zm2 18H6V5h7v5h5v9z" />
+            </svg>
+            <h1 class="logo-glow" style="font-size: 2.3rem; margin: 0;">PASTEVIN</h1>
+        </div>
+
+
+
+
+        <!-- PIN Pad Section -->
+        <div id="pin-popup" class="pin-popup">
+            <button type="button" onclick="closePinPad()" id="pin-close-btn">✕</button>
+
+
+
+            <div class="bg-light p-4 shadow" style="width: 250px; border-radius: 35px;">
+                <div id="pin-display" class="mb-3 bg-warning text-center fw-bold fs-4 py-2">••••</div>
+                <div id="pin-error" class="text-danger mt-2" style="font-size: 0.9rem; display: none;">Wrong PIN</div>
+                <div class="d-grid gap-2">
+                    <div class="d-flex justify-content-between">
+                        <button class="pin-btn" onclick="pressDigit(1)">1</button>
+                        <button class="pin-btn" onclick="pressDigit(2)">2</button>
+                        <button class="pin-btn" onclick="pressDigit(3)">3</button>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button class="pin-btn" onclick="pressDigit(4)">4</button>
+                        <button class="pin-btn" onclick="pressDigit(5)">5</button>
+                        <button class="pin-btn" onclick="pressDigit(6)">6</button>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button class="pin-btn" onclick="pressDigit(7)">7</button>
+                        <button class="pin-btn" onclick="pressDigit(8)">8</button>
+                        <button class="pin-btn" onclick="pressDigit(9)">9</button>
+                    </div>
+
+
+
+
+                    <div class="d-flex justify-content-center mt-2">
+                        <button class="pin-btn" onclick="pressDigit(0)">0</button>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Bouncy Button Styles -->
+        <style>
+            .pin-popup {
+                display: none;
+                position: fixed;
+                z-index: 1050;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.2);
+                align-items: center;
+                justify-content: center;
+            }
+
+            .pin-popup.show {
+                display: flex;
+            }
+
+            .pin-btn {
+                background-color: #14213d;
+                border: none;
+                color: white;
+                font-weight: bold;
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                font-size: 1.5rem;
+                transition: transform 0.1s ease;
+                box-shadow: 0 4px 0 #a1a6a3;
+            }
+
+            .pin-btn:active {
+                transform: scale(0.9);
+            }
+
+            #pin-display {
+                letter-spacing: 8px;
+                border-radius: 22px;
+            }
+        </style>
+
+        <!-- PIN Pad Logic -->
+        <script>
+            const correctPin = "{{ pin_code }}";
+
+            function pressDigit(num) {
+                if (currentPin.length < 4) {
+                    currentPin += num;
+                    updateDisplay();
+                    if (currentPin.length === 4) {
+                        submitPin(); // auto-submit after 4 digits
+                    }
+                }
+            }
+
+            function updateDisplay() {
+                document.getElementById('pin-display').textContent = currentPin.padEnd(4, '•');
+            }
+
+            function clearPin() {
+                currentPin = "";
+                updateDisplay();
+            }
+
+            function submitPin() {
+                const display = document.getElementById('pin-display');
+
+                if (currentPin === correctPin) {
+                    if (pendingDeleteForm) {
+                        showToast("File deleted!");
+                        pendingDeleteForm.submit();
+                        pendingDeleteForm = null;
+                    }
+                    closePinPad();
+                } else {
+                    display.textContent = "Wrong PIN";
+                    display.classList.remove("bg-warning");
+                    display.classList.add("bg-danger");
+
+                    setTimeout(() => {
+                        clearPin();
+                        display.classList.remove("bg-danger");
+                        display.classList.add("bg-warning");
+                    }, 1200);
+                }
+            }
+
+
+
+
+
+            let pendingDeleteForm = null;
+
+            function handleDeleteRequest(form) {
+                pendingDeleteForm = form;
+                openPinPad();
+            }
+
+
+            // Optional: trigger it with a button elsewhere
+            function openPinPad() {
+                const popup = document.getElementById('pin-popup');
+                popup.classList.add('show');
+                clearPin();
+            }
+
+            function closePinPad() {
+                const popup = document.getElementById('pin-popup');
+                popup.classList.remove('show');
+            }
+        </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <a href="/checklist" class="checklist-btn">📝 Open Checklist</a>
+
+
+
+
+
+
+
+        <!-- Add Note Form -->
+        <section id="notes">
+            <h3 class="ten" style="font-weight: normal;">Add Note</h3>
+            <form method="POST" action="{{ url_for('save') }}#notes-section" class="mb-4">
+                <input class="form-control mb-2" type="text" name="title" placeholder="Enter title/key">
+                <textarea class="form-control mb-2" name="content" placeholder="Enter note content" required></textarea>
+                <button type="submit" class="btn btn-primary">Save Note</button>
+            </form>
+        </section>
+
+
+
+        <!-- File Upload Form -->
+        <section id="files">
+            <h3 class="ten" style="font-weight: normal;">Upload Files</h3>
+            <form method="POST" action="{{ url_for('upload_file') }}#files" enctype="multipart/form-data" class="mb-4">
+                <input class="form-control mb-2" type="file" name="files" multiple required>
+                <button type="submit" class="btn btn-primary">Upload File(s)</button>
+            </form>
+        </section>
+
+        <!-- Uploaded Files -->
+        {% if files %}
+        <div class="file-card mb-4" id="files-section">
+            <h3>Uploaded Files</h3>
+            {% for file in files %}
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <a class="file-link tru-fname" href="{{ url_for('uploaded_file', filename=file) }}">{{ file }}</a>
+                <form method="POST" action="{{ url_for('delete_file', filename=file) }}#files-section">
+                    <button type="button" class="btn btn-danger btn-sm"
+                        onclick="handleDeleteRequest(this.closest('form'))">Delete</button>
+
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Folders Section -->
+        <section id="folders">
+            <div class="note-card mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h3>Folders</h3>
+                    <form method="POST" action="{{ url_for('create_folder') }}#folders" style="display:inline;">
+                        <button type="submit" class="btn btn-primary btn-sm">Add Folder</button>
+                    </form>
+                </div>
+
+                <ul class="list-unstyled">
+                    {% for folder_name in get_unique_folders(notes) %}
+                    <li class="d-flex justify-content-between align-items-center mb-2">
+                        <a href="{{ url_for('view_folder', folder_name=folder_name) }}" class="folder-link">{{
+                            folder_name }}</a>
+                        <form method="POST" action="{{ url_for('delete_folder', folder_name=folder_name) }}#folders"
+                            style="display:inline;">
+                            <input type="password" name="password" style="display: none;" value="{{ pin_code }}">
+
+                            <button type="button" class="btn btn-danger"
+                                onclick="handleDeleteRequest(this.closest('form'))">Delete</button>
+                        </form>
+
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </section>
+        <!-- Saved Notes Section -->
+        <section id="notes-section">
+            <h3 class="ten" style="font-weight: normal;">Saved Notes</h3>
+            {% for title, content in notes.items() %}
+            {% if '/' not in title %}
+            <div class="note-card" id="note-{{ title }}">
+                <div class="note-content">
+                    <a href="{{ url_for('view_note', key=title) }}" class="text-decoration-none">{{ title }}</a>
+                    <div class="preview-text" id="content-{{ title }}">{{ content.split('\n')[0][:50] }}</div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-copy btn-sm" data-base="{{ content|b64encode }}"
+                        onclick="copyBase64(this)">Copy</button>
+                    <form method="POST" action="{{ url_for('delete_note', key=title) }}#notes-section"
+                        style="display:inline;">
+                        <input type="password" name="password" style="display: none;" value="{{ pin_code }}">
+
+                        <button type="button" class="btn btn-danger"
+                            onclick="handleDeleteRequest(this.closest('form'))">Delete</button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </section>
+
+
+    </div>
+
+    <script>
+
+        function copyContent(key) {
+            const contentElement = document.getElementById(`content-${key}`);
+            if (contentElement) {
+                const text = contentElement.innerText;
+                navigator.clipboard.writeText(text).then(() => {
+                    let toast = document.createElement("div");
+                    toast.innerText = "Copied!";
+                    toast.style.position = "fixed";
+                    toast.style.bottom = "30px";
+                    toast.style.left = "50%";
+                    toast.style.transform = "translateX(-50%)";
+                    toast.style.backgroundColor = "#28a745";
+                    toast.style.color = "white";
+                    toast.style.padding = "10px 20px";
+                    toast.style.borderRadius = "8px";
+                    toast.style.boxShadow = "0 2px 5px rgba(0,0,0,0.2)";
+                    document.body.appendChild(toast);
+                    setTimeout(() => toast.remove(), 1500);
+                });
+            }
+        }
+
+        function showToast(message) {
+            let toast = document.createElement("div");
+            toast.innerText = message;
+            toast.style.position = "fixed";
+            toast.style.bottom = "30px";
+            toast.style.left = "50%";
+            toast.style.transform = "translateX(-50%)";
+            toast.style.backgroundColor = "#ed4337";  // red for delete
+            toast.style.color = "white";
+            toast.style.padding = "10px 20px";
+            toast.style.borderRadius = "8px";
+            toast.style.boxShadow = "0 2px 5px rgba(0,0,0,0.2)";
+            toast.style.zIndex = "9999";
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+        }
+
+
+        function copyBase64(btn) {
+            const base = btn.dataset.base;
+            const decoded = atob(base);
+            navigator.clipboard.writeText(decoded).then(() => {
+                let toast = document.createElement("div");
+                toast.innerText = "Copied!";
+                toast.style.position = "fixed";
+                toast.style.bottom = "30px";
+                toast.style.left = "50%";
+                toast.style.transform = "translateX(-50%)";
+                toast.style.backgroundColor = "#28a745";
+                toast.style.color = "white";
+                toast.style.padding = "10px 20px";
+                toast.style.borderRadius = "8px";
+                toast.style.boxShadow = "0 2px 5px rgba(0,0,0,0.2)";
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 1500);
+            });
+        }
+
+
+
+    </script>
+
+</body>
+
+</html>

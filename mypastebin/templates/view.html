@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ key }} - PasteVin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4faf8;
+            padding: 20px;
+            font-family: 'Tahoma', 'Roboto', sans-serif;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            text-align: center;
+        }
+
+        .note-content {
+            background: #ffffff;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 16px;
+            min-height: 100px;
+            margin-bottom: 20px;
+        }
+
+        .btn-primary {
+            background-color: #0066cc;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            border-radius: 8px;
+        }
+
+        .btn-primary:hover {
+            background-color: #004c99;
+        }
+
+        .scroll-button {
+            position: fixed;
+            right: 20px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 999;
+        }
+
+        .scroll-down {
+            top: 20px;
+        }
+
+        .scroll-up {
+            bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Scroll Down Button -->
+    <button class="scroll-button scroll-down" onclick="scrollToBottom()">↓</button>
+
+    <div class="container" id="note-section">
+        <h1>{{ key }}</h1>
+
+        <div class="note-content" id="note-content">{{ note }}</div>
+
+        <!-- Copy Button -->
+        <button onclick="copyText()" class="btn btn-primary mb-3">Copy Text</button><br>
+
+        <!-- Back to Folder or Home -->
+        {% set folder_name = key.split('/')[0] if '/' in key else None %}
+        {% if folder_name %}
+        <a href="{{ url_for('view_folder', folder_name=folder_name) }}#notes"
+            class="btn btn-outline-dark fw-bold mt-2">← Back to {{ folder_name }}</a>
+        {% else %}
+        <a href="{{ url_for('home') }}#notes-section" class="btn btn-outline-dark fw-bold mt-2">← Back to Home</a>
+        {% endif %}
+
+        <!-- Edit Button -->
+        <form action="{{ url_for('edit_note', key=key) }}" method="get">
+            <button type="submit" class="btn btn-warning fw-bold mt-2">✎ Edit Note</button>
+        </form>
+
+    </div>
+
+    <!-- Scroll Up Button -->
+    <button class="scroll-button scroll-up" onclick="scrollToTop()">↑</button>
+
+    <script>
+        function copyText() {
+            const text = document.getElementById("note-content").innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                let toast = document.createElement("div");
+                toast.innerText = "Copied!";
+                toast.style.position = "fixed";
+                toast.style.bottom = "30px";
+                toast.style.left = "50%";
+                toast.style.transform = "translateX(-50%)";
+                toast.style.backgroundColor = "#28a745";
+                toast.style.color = "white";
+                toast.style.padding = "10px 20px";
+                toast.style.borderRadius = "8px";
+                toast.style.boxShadow = "0 2px 5px rgba(0,0,0,0.2)";
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 1500);
+            });
+        }
+
+        function scrollToBottom() {
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit {{ key }} - PasteVin</title>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/942/942748.png" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4faf8;
+            padding: 20px;
+            font-family: 'Tahoma', 'Roboto', sans-serif;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: auto;
+        }
+
+        textarea {
+            width: 100%;
+            height: 250px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            resize: vertical;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2 class="mb-4">Editing Note: <small>{{ key }}</small></h2>
+
+        <form action="{{ url_for('update_note', key=key) }}" method="post">
+            <div class="mb-3">
+                <textarea name="content" required>{{ note }}</textarea>
+            </div>
+            <div class="mb-3">
+                <input type="password" name="password" class="form-control" placeholder="Admin Password" required>
+            </div>
+            <button type="submit" class="btn btn-success">Save Changes</button>
+            <a href="/view/{{ key }}" class="btn btn-secondary ms-2">Cancel</a>
+
+        </form>
+    </div>
+</body>
+
+</html>
